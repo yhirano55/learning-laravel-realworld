@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  app:
+    build: ./
+    container_name: app
+    environment:
+      TZ: ${TZ:-Asia/Tokyo}
+    ports:
+      - '${HOST_APP_PORT:-9000}:9000'
+    command: php artisan serve --host=0.0.0.0 --port=9000
+    depends_on:
+      - db
+    volumes:
+      - .:/var/www/html/app
+
+  db:
+    image: mysql:5.7
+    environment:
+      TZ: ${TZ:-Asia/Tokyo}
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    command: mysqld --innodb-file-format=Barracuda --innodb-file-per-table --innodb-large-prefix
+    ports:
+      - '${HOST_DB_PORT:-13306}:3306'
+    volumes:
+      - db-data:/var/lib/mysql
+
+  selenium-hub:
+    image: selenium/hub:3.141.59-vanadium
+    ports:
+      - 4444:4444
+
+  chrome:
+    image: selenium/node-chrome:3.141.59-vanadium
+    volumes:
+      - /dev/shm:/dev/shm
+    depends_on:
+      - selenium-hub
+    environment:
+      HUB_HOST: selenium-hub
+      HUB_PORT: 4444
+
+volumes:
+  db-data:
