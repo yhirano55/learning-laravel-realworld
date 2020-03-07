@@ -15,7 +15,27 @@ class Tags extends Migration
     {
         Schema::create('tags', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
             $table->timestamps();
+
+            $table->unique('name');
+        });
+
+        Schema::create('article_tags', function (Blueprint $table) {
+            $table->unsignedBigInteger('article_id');
+            $table->unsignedBigInteger('tag_id');
+
+            $table->primary(['article_id', 'tag_id']);
+
+            $table->foreign('article_id')
+                ->references('id')
+                ->on('articles')
+                ->onDelete('cascade');
+
+            $table->foreign('tag_id')
+                ->references('id')
+                ->on('tags')
+                ->onDelete('cascade');
         });
     }
 
@@ -26,6 +46,7 @@ class Tags extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('article_tags');
         Schema::dropIfExists('tags');
     }
 }
