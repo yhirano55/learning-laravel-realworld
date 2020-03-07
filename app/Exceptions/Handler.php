@@ -2,6 +2,8 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 
@@ -50,6 +52,62 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
+        if ($request->ajax() || $request->wantsJson()) {
+            return $this->getJsonResponse($exception);
+        }
+
         return parent::render($request, $exception);
+    }
+
+    /**
+     * Get the json response for the exception.
+     *
+     * @param Throwable $exception
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function getJsonResponse(Throwable $exception)
+    {
+        if ($exception instanceof ValidationException) {
+            $validationErrors = $exception->validator->errors()->getMessages();
+
+            $response = [
+                'errors' => $validationErrors
+            ];
+
+            return response()->json($response, 422);
+        }
+
+        $statusCode = $this->getStatusCode($exception);
+
+        if (! $message = $exception->getMessage()) {
+            $message = sprintf('%d %s', $statusCode, Response::$statusTexts[$statusCode]);
+        }
+
+        $errors = [
+            'message' => $message,
+            'status_code' => $statusCode,
+        ];
+
+        if (app('app.debug')) {
+            $errors['exception'] = get_class($exception);
+            $errors['trace'] = explode("\n", $exception->getTraceAsString());
+        }
+
+        $response = [
+            'errors' => $errors,
+        ];
+
+        return response()->json($response, $statusCode);
+    }
+
+    /**
+     * Get the status code from the exception.
+     *
+     * @param Throwable $exception
+     * @return int
+     */
+    protected function getStatusCode(Throwable $exception)
+    {
+        return $this->isHttpException($exception) ? $exception->getStatusCode() : 500;
     }
 }

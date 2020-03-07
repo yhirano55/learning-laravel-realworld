@@ -21,9 +21,9 @@ Route::group(['namespace', 'Api'], function () {
         Route::match(['put', 'patch'], 'user', 'UserController@update');
 
         Route::group(['prefix' => 'profiles'], function() {
-            Route::get('{username}', 'ProfileController@show');
-            Route::post('{username}/follow', 'ProfileController@follow');
-            Route::delete('{username}/follow', 'ProfileController@unfollow');
+            Route::get('{user}', 'ProfileController@show');
+            Route::post('{user}/follow', 'ProfileController@follow');
+            Route::delete('{user}/follow', 'ProfileController@unfollow');
         });
 
         Route::resource('articles', 'ArticleController', [
@@ -32,9 +32,9 @@ Route::group(['namespace', 'Api'], function () {
             ]
         ]);
 
-        Route::get('articles/feed', 'ArticleController@feed');
-        Route::post('articles/{article}/favorite', 'ArticleController@favorite');
-        Route::delete('articles/{article}/favorite', 'ArticleController@unFavorite');
+        Route::get('articles/feed', 'ProfileController@feed');
+        Route::post('articles/{article}/favorite', 'ProfileController@favorite');
+        Route::delete('articles/{article}/favorite', 'ProfileController@unFavorite');
 
         Route::resource('articles/{article}/comments', 'CommentController', [
             'only' => [
