@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use Illuminate\Support\Collection;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 
 class ApiController extends Controller
 {
@@ -22,7 +22,11 @@ class ApiController extends Controller
     protected function respondWithTransformer($data, $statusCode = 200, $headers = [])
     {
         if ($this->transformer !== null) {
-            $data = $this->transformer->item($data);
+            if ($data instanceof Collection) {
+                $data = $this->transformater->collection($data->toArray());
+            } else {
+                $data = $this->transformer->item($data);
+            }
         }
 
         return $this->respond($data, $statusCode, $headers);

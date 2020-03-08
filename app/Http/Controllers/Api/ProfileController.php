@@ -21,16 +21,16 @@ class ProfileController extends ApiController
 
     public function follow(User $user)
     {
-        $currentUser = auth()->user();
-        $currentUser->follow($user);
+        $authenticatedUser = auth()->user();
+        $authenticatedUser->follow($user);
 
         return $this->respondWithTransformer($user);
     }
 
     public function unFollow(User $user)
     {
-        $currentUser = auth()->user();
-        $currentUser->unFollow($user);
+        $authenticatedUser = auth()->user();
+        $authenticatedUser->unFollow($user);
 
         return $this->respondWithTransformer($user);
     }
