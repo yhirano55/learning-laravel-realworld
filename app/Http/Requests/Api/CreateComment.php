@@ -2,18 +2,16 @@
 
 namespace App\Http\Requests\Api;
 
-use Illuminate\Foundation\Http\FormRequest;
-
-class CreateComment extends FormRequest
+class CreateComment extends ApiRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Get data to be validated from the request.
      *
-     * @return bool
+     * @return array
      */
-    public function authorize()
+    public function validationData()
     {
-        return false;
+        return $this->get('comment') ?: [];
     }
 
     /**

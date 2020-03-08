@@ -21,7 +21,10 @@ class UserController extends ApiController
     public function update(UpdateUser $request)
     {
         $user = auth()->user();
-        $user->update($request->get('user'));
+
+        if ($request->has('user')) {
+            $user->update($request->get('user'));
+        }
 
         return $this->respondUnauthorized($user);
     }
