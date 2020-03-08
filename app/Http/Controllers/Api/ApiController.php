@@ -23,7 +23,7 @@ class ApiController extends Controller
     {
         if ($this->transformer !== null) {
             if ($data instanceof Collection) {
-                $data = $this->transformater->collection($data->toArray());
+                $data = $this->transformater->collection($data);
             } else {
                 $data = $this->transformer->item($data);
             }
