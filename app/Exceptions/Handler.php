@@ -67,6 +67,8 @@ class Handler extends ExceptionHandler
      */
     protected function getJsonResponse(Throwable $exception)
     {
+        $exception = $this->prepareException($exception);
+
         if ($exception instanceof ValidationException) {
             $validationErrors = $exception->validator->errors()->getMessages();
 

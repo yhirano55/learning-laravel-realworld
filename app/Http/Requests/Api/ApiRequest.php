@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\Api;
 
-use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ApiRequest extends FormRequest
@@ -22,10 +21,10 @@ class ApiRequest extends FormRequest
      *
      * @return array
      */
-    public function rules(Validator $validator)
+    public function rules()
     {
         return [
-            'errors' => $validator->getMessageBag()->toArray()
+            //
         ];
     }
 }

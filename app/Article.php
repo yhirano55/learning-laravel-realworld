@@ -16,7 +16,7 @@ class Article extends Model
      * @var array
      */
     protected $fillable = [
-        'slug', 'title', 'description', 'body',
+        'title', 'description', 'body',
     ]
 
     public function getTagListAttribute()
@@ -41,7 +41,7 @@ class Article extends Model
      */
     public function comments()
     {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(Comment::class)->latest();
     }
 
     /**
