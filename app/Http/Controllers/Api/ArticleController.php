@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Filters\ArticleFilter;
 use App\Tag;
 use App\Article;
 use App\Http\Requests\Api\CreateArticle;
 use App\Http\Requests\Api\UpdateArticle;
 use App\Http\Requests\Api\DeleteArticle;
 use App\Transformers\ArticleTransformer;
-use Symfony\Component\Console\Input\Input;
 
 class ArticleController extends ApiController
 {
@@ -19,10 +19,10 @@ class ArticleController extends ApiController
         $this->middleware('auth.api:optional')->except(['index', 'show']);
     }
 
-    public function index()
+    public function index(ArticleFilter $filter)
     {
         // WIP
-        $articles = Article::latest()->get();
+        $articles = Article::latest()->filter($filter)->get();
 
         return $this->respondWithTransformer($articles);
     }
