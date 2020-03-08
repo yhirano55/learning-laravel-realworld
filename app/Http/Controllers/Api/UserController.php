@@ -15,15 +15,14 @@ class UserController extends ApiController
 
     public function index()
     {
-        $user = $this->transformer->item(auth()->user());
-        return $this->respond($user);
+        return $this->respondUnauthorized(auth()->user());
     }
 
     public function update(UpdateUser $request)
     {
         $user = auth()->user();
         $user->update($request->get('user'));
-        $user = $this->transformater->item($user);
-        return $this->respond($user);
+
+        return $this->respondUnauthorized($user);
     }
 }

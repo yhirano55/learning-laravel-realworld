@@ -11,20 +11,27 @@ class ProfileController extends ApiController
     {
         $this->transformer = $transformer;
         $this->middleware('auth.api')->except('show');
+        $this->middleware('auth.api:optional')->except('show');
     }
 
     public function show(User $user)
     {
-        //
+        return $this->respondWithTransformer($user);
     }
 
     public function follow(User $user)
     {
-        //
+        $currentUser = auth()->user();
+        $currentUser->follow($user);
+
+        return $this->respondWithTransformer($user);
     }
 
     public function unFollow(User $user)
     {
-        //
+        $currentUser = auth()->user();
+        $currentUser->unFollow($user);
+
+        return $this->respondWithTransformer($user);
     }
 }
