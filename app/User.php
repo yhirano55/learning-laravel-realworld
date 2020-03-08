@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Tymon\JWTAuth\JWTAuth;
 use App\Traits\FavoriteTrait;
 use App\Traits\FollowableTrait;
@@ -77,6 +78,18 @@ class User extends Authenticatable
     public function comments()
     {
         return $this->hasMany(Comment::class)->latest();
+    }
+
+    /**
+     * Get all the following user articles.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function feed()
+    {
+        $followingIds = $this->following()->pluck('id')->toArray();
+
+        return Article::latest()->whereIn('user_id', $followingIds);
     }
 
     /**

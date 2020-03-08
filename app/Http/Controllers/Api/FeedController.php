@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Article;
+use App\Paginate\Paginator;
 use App\Transformers\ArticleTransformer;
 
 class FeedController extends ApiController
@@ -15,6 +15,10 @@ class FeedController extends ApiController
 
     public function index()
     {
-        //
+        $user = auth()->user();
+        $articles = new Paginator($user->feed());
+
+        return $this->respondWithPagination($articles);
     }
 }
+

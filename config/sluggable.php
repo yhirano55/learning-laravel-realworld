@@ -87,7 +87,7 @@ return [
      * "similar" slugs.  The closure should return the new unique
      * suffix to append to the slug.
      */
-    
+
     'uniqueSuffix' => null,
 
     /**
@@ -123,7 +123,7 @@ return [
      * and continue from there.
      */
 
-    'reserved' => null,
+    'reserved' => ['feed'],
 
     /**
      * Whether to update the slug value when a model is being
@@ -135,7 +135,7 @@ return [
      * is probably not a good idea from an SEO point of view.
      * Only set this to true if you understand the possible consequences.
      */
-    
+
     'onUpdate' => false,
 
 ];
