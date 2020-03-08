@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use Exception;
+use App\Paginate\Paginator;
 use Illuminate\Support\Collection;
 use App\Http\Controllers\Controller;
 
@@ -9,9 +11,31 @@ class ApiController extends Controller
 {
     protected $transformater = null;
 
-    public function respond($data, $statusCode = 200, $headers = [])
+    protected function respond($data, $statusCode = 200, $headers = [])
     {
         return response()->json($data, $statusCode, $headers);
+    }
+
+    protected function respondWithTransformer($data, $statusCode = 200, $headers = [])
+    {
+        $this->checkTransformer();
+
+        if ($data instanceof Collection) {
+            $data = $this->transformater->collection($data);
+        } else {
+            $data = $this->transformer->item($data);
+        }
+
+        return $this->respond($data, $statusCode, $headers);
+    }
+
+    protected function respondWithPagination($paginator, $statusCode = 200, $headers = [])
+    {
+        $this->checkPaginator($paginator);
+        $this->checkTransformer();
+        $data = $this->transformer->paginate($paginator);
+
+        return $this->respond($data, $statusCode, $headers);
     }
 
     protected function respondSuccess()
@@ -24,25 +48,12 @@ class ApiController extends Controller
         return $this->respond($data, 201);
     }
 
-    protected function respondWithTransformer($data, $statusCode = 200, $headers = [])
-    {
-        if ($this->transformer !== null) {
-            if ($data instanceof Collection) {
-                $data = $this->transformater->collection($data);
-            } else {
-                $data = $this->transformer->item($data);
-            }
-        }
-
-        return $this->respond($data, $statusCode, $headers);
-    }
-
     protected function respondNoContent()
     {
         return $this->respond(null, 204);
     }
 
-    public function respondError($message, $statusCode)
+    protected function respondError($message, $statusCode)
     {
         return $this->respond([
             'error' => [
@@ -70,5 +81,19 @@ class ApiController extends Controller
     protected function respondInternalError($message = 'Internal Error')
     {
         return $this->respondError($message, 500);
+    }
+
+    private function checkTransformer()
+    {
+        if ($this->transformer === null) {
+            throw new Exception('Data transformer not set');
+        }
+    }
+
+    private function checkPaginator($paginator)
+    {
+        if (! $paginator instanceof Paginator) {
+            throw new Exception('Expected instance of Paginator');
+        }
     }
 }
