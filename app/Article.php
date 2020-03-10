@@ -4,8 +4,9 @@ namespace App;
 
 use App\Filters\Filterable;
 use App\Traits\FavoritedTrait;
-use Cviebrock\EloquentSluggable\Sluggable
+use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Builder;
 
 class Article extends Model
 {
@@ -18,11 +19,29 @@ class Article extends Model
      */
     protected $fillable = [
         'title', 'description', 'body',
-    ]
+    ];
+
+    /**
+     * The relations to eager load on every query
+     *
+     * @var array
+     */
+    protected $with = ['tags'];
 
     public function getTagListAttribute()
     {
-        return $this->tags()->pluck('name')->toArray();
+        return $this->tags->pluck('name')->toArray();
+    }
+
+    public function scopeLoadRelations($query)
+    {
+        return $query->with(['user.followers' => function ($query) {
+                $query->where('follower_id', auth()->id());
+            }])
+            ->with(['favorited' => function ($query) {
+                $query->where('user_id', auth()->id());
+            }])
+            ->withCount('favorited');
     }
 
     /**
