@@ -8,44 +8,74 @@ use Illuminate\Database\Eloquent\Builder;
 
 abstract class Filter
 {
-   protected $request;
+    /**
+     * @var \Illuminate\Http\Request
+     */
+    protected $request;
 
-   protected $builder;
+    /**
+     * @var \Illuminate\Database\Eloquent\Builder
+     */
+    protected $builder;
 
-   public function __construct(Request $request)
-   {
-       $this->request = $request;
-   }
+    /**
+     * Filter constructor.
+     *
+     * @param \Illuminate\Http\Request $request
+     */
+    public function __construct(Request $request)
+    {
+        $this->request = $request;
+    }
 
-   protected function getFilterMethods()
-   {
-       $class = new ReflectionClass(static::class);
+    /**
+     * Get all available filter methods.
+     *
+     * @return array
+     * @throws \ReflectionException
+     */
+    protected function getFilterMethods()
+    {
+        $class = new ReflectionClass(static::class);
 
-       $methods = array_map(function($method) use ($class) {
-           if ($method->class === $class->getName()) {
-               return $method->name;
-           }
-           return null;
-       }, $class->getMethods());
+        $methods = array_map(function($method) use ($class) {
+            if ($method->class === $class->getName()) {
+                return $method->name;
+            }
+            return null;
+        }, $class->getMethods());
 
-       return array_filter($methods);
-   }
+        return array_filter($methods);
+    }
 
-   protected function getFilters()
-   {
-       return $this->request->inspect($this->getFilterMethods());
-   }
+    /**
+     * Get all the filters that can be applied.
+     *
+     * @return mixed
+     * @throws \ReflectionException
+     */
+    protected function getFilters()
+    {
+        return $this->request->inspect($this->getFilterMethods());
+    }
 
-   public function apply(Builder $builder)
-   {
-       $this->builder = $builder;
+    /**
+     * Apply all the requested filters if available.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $builder
+     * @return \Illuminate\Database\Eloquent\Builder
+     * @throws \ReflectionException
+     */
+    public function apply(Builder $builder)
+    {
+        $this->builder = $builder;
 
-       foreach ($this->getFilters() as $name => $value) {
-           if (method_exists($this, $name)) {
-               $this->$name($value);
-           }
-       }
+        foreach ($this->getFilters() as $name => $value) {
+            if (method_exists($this, $name)) {
+                $this->$name($value);
+            }
+        }
 
-       return $this->builder;
-   }
+        return $this->builder;
+    }
 }

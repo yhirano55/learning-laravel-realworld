@@ -71,12 +71,7 @@ class Handler extends ExceptionHandler
 
         if ($exception instanceof ValidationException) {
             $validationErrors = $exception->validator->errors()->getMessages();
-
-            $response = [
-                'errors' => $validationErrors
-            ];
-
-            return response()->json($response, 422);
+            return response()->json(['errors' => $validationErrors], 422);
         }
 
         $statusCode = $this->getStatusCode($exception);
@@ -95,11 +90,7 @@ class Handler extends ExceptionHandler
             $errors['trace'] = explode("\n", $exception->getTraceAsString());
         }
 
-        $response = [
-            'errors' => $errors,
-        ];
-
-        return response()->json($response, $statusCode);
+        return response()->json(['errors' => $errors], $statusCode);
     }
 
     /**

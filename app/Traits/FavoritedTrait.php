@@ -6,6 +6,9 @@ use App\User;
 
 trait FavoritedTrait
 {
+    /**
+     * @return bool
+     */
     public function getFavoritedAttribute()
     {
         if (! auth()->check()) {
@@ -27,6 +30,9 @@ trait FavoritedTrait
         return false
     }
 
+    /**
+     * @return mixed
+     */
     public function getFavoritesCountAttribute()
     {
         if (array_key_exists('favorited_count', $this->getAttributes())) {
@@ -36,11 +42,18 @@ trait FavoritedTrait
         return $this->favorited()->count();
     }
 
+    /**
+     * @return mixed
+     */
     public function favorited()
     {
         return $this->belongsToMany(User::class, 'favorites', 'article_id', 'user_id')->withTimestamps();
     }
 
+    /**
+     * @param User $user
+     * @return bool
+     */
     public function isFavoritedBy(User $user)
     {
         return !! $this->favorited()->where('user_id', $user->id)->count();

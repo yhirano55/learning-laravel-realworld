@@ -6,7 +6,7 @@ use App\Filters\Filterable;
 use App\Traits\FavoritedTrait;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Builder;
+use Tymon\JWTAuth\Providers\Auth\Illuminate;
 
 class Article extends Model
 {
@@ -26,13 +26,24 @@ class Article extends Model
      *
      * @var array
      */
-    protected $with = ['tags'];
+    protected $with = [
+        'tags'
+    ];
 
+    /**
+     * Get the list of attached to the article.
+     *
+     * @return array
+     */
     public function getTagListAttribute()
     {
         return $this->tags->pluck('name')->toArray();
     }
 
+    /**
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     public function scopeLoadRelations($query)
     {
         return $query->with(['user.followers' => function ($query) {
